@@ -1,4 +1,5 @@
-﻿using ImageViewer.Loader;
+﻿using ImageViewer.Windows.DirectoryPicker;
+using ImageViewer.Windows.Loader;
 using Microsoft.Win32;
 using System;
 using System.IO;
@@ -10,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-namespace ImageViewer
+namespace ImageViewer.Windows.ImageViewer
 {
     /// <summary>
     /// Interaction logic for WindowBorderLess.xaml

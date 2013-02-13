@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using ImageViewer.Windows.ImageViewer;
+using System.Windows;
 
 namespace ImageViewer.Control
 {

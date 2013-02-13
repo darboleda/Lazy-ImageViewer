@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace ImageViewer.Loader
+namespace ImageViewer.Windows.Loader
 {
     public class DirectoryImageSequence : IImageSequence
     {

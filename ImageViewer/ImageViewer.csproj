@@ -89,7 +89,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\DirectoryPickWindow.xaml">
+    <Page Include="Windows\DirectoryPicker\DirectoryPickWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -101,7 +101,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\ImageViewWindow.xaml">
+    <Page Include="Windows\ImageViewer\ImageViewWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -113,19 +113,19 @@
     <Compile Include="Control\CaptionButtons.xaml.cs">
       <DependentUpon>CaptionButtons.xaml</DependentUpon>
     </Compile>
-    <Compile Include="StringSorter.cs" />
-    <Compile Include="Windows\DirectoryPickWindow.xaml.cs">
+    <Compile Include="Windows\StringSorter.cs" />
+    <Compile Include="Windows\DirectoryPicker\DirectoryPickWindow.xaml.cs">
       <DependentUpon>DirectoryPickWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\ImageViewWindow.xaml.cs">
+    <Compile Include="Windows\ImageViewer\ImageViewWindow.xaml.cs">
       <DependentUpon>ImageViewWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Windows\ImageViewerCallbacks.cs" />
+    <Compile Include="Windows\ImageViewer\ImageViewerCallbacks.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Loader\DirectoryImageSequence.cs" />
-    <Compile Include="Loader\IImageSequence.cs" />
+    <Compile Include="Windows\Loader\DirectoryImageSequence.cs" />
+    <Compile Include="Windows\Loader\IImageSequence.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -178,9 +178,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DirectoryPicker\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

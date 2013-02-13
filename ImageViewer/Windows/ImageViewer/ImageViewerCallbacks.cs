@@ -1,5 +1,4 @@
-﻿using ImageViewer.Loader;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,10 +9,11 @@ using System.Windows.Media;
 
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using ImageViewer.Windows.Loader;
 
-namespace ImageViewer
+namespace ImageViewer.Windows.ImageViewer
 {
-    public partial class ImageViewWindow
+    public partial class ImageViewWindow : Window
     {
         void InitializeCallbacks()
         {

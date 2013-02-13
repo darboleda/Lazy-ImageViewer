@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Media;
 
-namespace ImageViewer.Loader
+namespace ImageViewer.Windows.Loader
 {
     public struct Dpi
     {
