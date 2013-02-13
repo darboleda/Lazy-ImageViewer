@@ -73,7 +73,6 @@ namespace ImageViewer
 
         void OnWindowMouseDown(object sender, MouseButtonEventArgs e)
         {
-            //mousein = true;
             if (e.RightButton == MouseButtonState.Pressed)
             {
                 ToggleScale();

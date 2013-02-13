@@ -21,9 +21,6 @@ namespace ImageViewer
     public partial class DirectoryPickWindow : Window
     {
         DirectoryInfo startingDirectory;
-        //Stack<DirectoryInfo> previousDirectories;
-        //DirectoryInfo currentDirectory;
-        //DirectoryInfo[] subDirectories;
         FileInfo[] files;
 
         string currentDirectoryName;
@@ -65,33 +62,6 @@ namespace ImageViewer
 
         DriveInfo[] drives;
 
-        //private DirectoryInfo CurrentDirectory
-        //{
-        //    get { return currentDirectory; }
-        //    set
-        //    {
-        //        if ((value.Attributes & FileAttributes.System) == FileAttributes.System)
-        //        {
-        //            if (previousDirectories != null
-        //                && previousDirectories.Count > 0
-        //                && currentDirectory.FullName == previousDirectories.Peek().FullName)
-        //                previousDirectories.Pop();
-        //            return;
-        //        }
-        //        else
-        //        {
-        //            if (startingDirectory == null)
-        //                startingDirectory = value;
-        //            currentDirectory = value;
-
-        //        }
-        //        CurrentDirName.Text = currentDirectory.Name;
-        //        subDirectories = currentDirectory.GetDirectories();
-        //        files = GetImageFiles(currentDirectory.GetFiles());
-        //        PopulateList(currentDirectory);
-        //    }
-        //}
-
         private FileInfo[] GetImageFiles(FileInfo[] fileInfo)
         {
             return fileInfo.Where((FileInfo file) => IsExtensionImage(file.Extension)).ToArray();
@@ -108,9 +78,7 @@ namespace ImageViewer
                 l.SelectedItem = current;
                 for (int i = 0; i < subDirectories.Length; i++)
                 {
-                    //DirectoryInfo dir = subDirectories[i];
                     string dir = subDirectories[i];
-                    //current = MakeListItem(dir.Name, "Files: " + dir.GetFiles().Length);
                     int len = 0;
                     try
                     {
@@ -120,7 +88,6 @@ namespace ImageViewer
 
                     current = MakeListItem(new DirectoryInfo(dir).Name, "Images:", len);
                     l.Items.Add(current);
-                    //if (previousDirectories != null && previousDirectories.Count > 0 && dir.FullName == previousDirectories.Peek().FullName)
                     if (previousDirectories != null && previousDirectories.Count > 0 && dir == previousDirectories.Peek())
                     {
                         l.SelectedItem = current;
@@ -190,13 +157,11 @@ namespace ImageViewer
         public DirectoryPickWindow(string startingDirectory, Window parent)
         {
             InitializeComponent();
-            //CurrentDirectory = new DirectoryInfo(startingDirectory);
             SetDirectory(startingDirectory);
             PreviewKeyDown += DirectoryPicker_PreviewKeyDown;
             
             this.parent = parent;
             Window w = GetWindow(this);
-            //previousDirectories = new Stack<DirectoryInfo>();
             previousDirectories = new Stack<string>();
             w.Loaded += w_Loaded;
             Done = false;
@@ -215,9 +180,7 @@ namespace ImageViewer
             {
                 if (DirectorySelectionList.SelectedIndex > 0)
                 {
-                    //DirectoryInfo di = subDirectories[DirectorySelectionList.SelectedIndex - 1];
                     string di = subDirectories[DirectorySelectionList.SelectedIndex - 1];
-                    //if (previousDirectories.Count > 0 && di.FullName == previousDirectories.Peek().FullName)
                     try
                     {
                         Directory.GetFiles(di);
@@ -225,7 +188,6 @@ namespace ImageViewer
                             previousDirectories.Pop();
                         else
                             previousDirectories.Clear();
-                        //CurrentDirectory = di;
                         SetDirectory(di);
                     }
                     catch (Exception) { }
@@ -235,7 +197,6 @@ namespace ImageViewer
                     Close();
                     if (DirectoryOpened != null)
                     {
-                        //DirectoryOpened(currentDirectory, startingDirectory.FullName == currentDirectory.FullName);
                         DirectoryOpened(new DirectoryInfo(currentDirectoryName), startingDirectory.FullName == currentDirectoryName, true);
                     }
                 }
@@ -257,8 +218,6 @@ namespace ImageViewer
             switch (e.Key)
             {
                 case Key.Left:
-                    //previousDirectories.Push(CurrentDirectory);
-                    //CurrentDirectory = CurrentDirectory.Parent;
                     if (Directory.GetParent(currentDirectoryName) != null)
                     {
                         previousDirectories.Push(currentDirectoryName);
