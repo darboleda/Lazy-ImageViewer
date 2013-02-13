@@ -1,0 +1,36 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:ImageViewer"
+                    xmlns:ctrl="clr-namespace:ImageViewer.Control"
+                    xmlns:shell="clr-namespace:Microsoft.Windows.Shell;assembly=Microsoft.Windows.Shell">
+
+    <ControlTemplate x:Key="MainWindowControlTemplate" TargetType="{x:Type Window}">
+        <Border>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <ContentPresenter Margin="0" Grid.Row="0" Content="{TemplateBinding Content}"/>
+                <!-- Captions Buttons to control the window borderless-->
+                <ctrl:CaptionButtons Margin="0,0,0,0" Grid.Row="0" HorizontalAlignment="Right" Type="ReduceClose"
+                                        Foreground="{DynamicResource CaptionButtonColor}" FontSize="14" MarginButton="5,0,0,0"
+                                        VerticalAlignment="Top" shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
+
+            </Grid>
+        </Border>
+    </ControlTemplate>
+
+    <Style x:Key="MainWindowStyle" TargetType="{x:Type Window}">
+        <Setter Property="shell:WindowChrome.WindowChrome">
+            <Setter.Value>
+                <shell:WindowChrome
+                        ResizeBorderThickness="6"
+                        CaptionHeight="30"
+                        CornerRadius="0"
+                        GlassFrameThickness="0,0,0,1"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template" Value="{DynamicResource MainWindowControlTemplate}"/>
+    </Style>
+
+</ResourceDictionary>
