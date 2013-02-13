@@ -82,7 +82,7 @@ namespace ImageViewer.Windows.ImageViewer
         void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
             Matrix m = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
-            dpi = new Dpi() { X = m.M11 * 96, Y = m.M22 * 96 };
+            Model.TargetDpi = new Dpi() { X = m.M11 * 96, Y = m.M22 * 96 };
 
             appSettings = ApplicationSettings.LoadAppSettings();
             ((Window)sender).Width = appSettings.StartingWidth;

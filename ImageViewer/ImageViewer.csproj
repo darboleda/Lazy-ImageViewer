@@ -113,6 +113,11 @@
     <Compile Include="Control\CaptionButtons.xaml.cs">
       <DependentUpon>CaptionButtons.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\ImageViewer\IImageViewerController.cs" />
+    <Compile Include="Windows\ImageViewer\IImageViewerModel.cs" />
+    <Compile Include="Windows\ImageViewer\IImageViewerView.cs" />
+    <Compile Include="Windows\ImageViewer\StandardImageViewerController.cs" />
+    <Compile Include="Windows\ImageViewer\StandardImageViewerModel.cs" />
     <Compile Include="Windows\StringSorter.cs" />
     <Compile Include="Windows\DirectoryPicker\DirectoryPickWindow.xaml.cs">
       <DependentUpon>DirectoryPickWindow.xaml</DependentUpon>

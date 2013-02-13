@@ -16,59 +16,39 @@ namespace ImageViewer.Windows.ImageViewer
     /// <summary>
     /// Interaction logic for WindowBorderLess.xaml
     /// </summary>
-    public partial class ImageViewWindow
+    public partial class ImageViewWindow : IImageViewerView
     {
         private const double BASE_DPI = 96;
 
-        ApplicationSettings appSettings;
-        DirectoryPickWindow directoryPicker;
-        IImageSequence imageSequence;
-        IImageSequence ImageSequence
-        {
-            get { return imageSequence; }
-            set
-            {
-                imageSequence = value;
-                appSettings.DefaultDirectory = imageSequence.Directory.FullName;
-            }
-        }
-        Dpi dpi;
-
-        int maximizedScaleState;
-        int regularScaleState;
         public ImageViewWindow()
         {
-            directoryPicker = null;
             InitializeComponent();
             InitializeCallbacks();
-            maximizedScaleState = 0;
-            regularScaleState = 1;
-            imageSequence = null;
         }
 
         private void HandleScale(ImageSource image)
         {
             Window window = Window.GetWindow(this);
-            int s = (window.WindowState == System.Windows.WindowState.Maximized ? maximizedScaleState : regularScaleState);
+            ViewMode s = Model.GetMode(window.WindowState);
 
             double width;
             double factor;
             double height;
             switch (s)
             {
-                case 0:
+                case ViewMode.FillHorizontal:
                     width = Math.Min(window.Width, image.Width);
                     factor = width / image.Width;
                     Scroller.Width = factor * image.Width;
                     Scroller.Height = Math.Min(window.Height, factor * image.Height);
                     break;
-                case 1:
+                case ViewMode.FitHorizontal:
                     width = window.Width;
                     factor = width / image.Width;
                     Scroller.Width = factor * image.Width;
                     Scroller.Height = Math.Min(window.Height, factor * image.Height);
                     break;
-                case 2:
+                case ViewMode.FitVertical:
                     width = Math.Min(window.Width, image.Width);
                     height = Math.Min(window.Height, image.Height);
                     factor = Math.Min(width / image.Width, height / image.Height);
@@ -79,37 +59,7 @@ namespace ImageViewer.Windows.ImageViewer
             window.InvalidateVisual();
         }
 
-        private void ToggleScale()
-        {
-            if (ImageBox.Source == null) return;
-            if (GetWindow(this).WindowState == System.Windows.WindowState.Maximized)
-                maximizedScaleState = (maximizedScaleState + 1) % 3;
-            else
-                regularScaleState = (regularScaleState + 1) % 3;
-            Scroller.ScrollToTop();
-            HandleScale(ImageBox.Source);
-        }
 
-        private void SetImage(ImageSource image)
-        {
-            Window w = Window.GetWindow(this);
-            Scroller.Visibility = System.Windows.Visibility.Visible;
-            HandleScale(image);
-            ImageBox.Source = image;
-            flipped = false;
-            ImageBox.RenderTransform = hNormal;
-            Scroller.ScrollToTop();
-        }
-
-        private void OpenImage(string fullName)
-        {
-            DirectoryImageSequence s = new DirectoryImageSequence(Directory.GetParent(fullName));
-            s.TargetDpi = dpi;
-            if (!s.Equals(ImageSequence))
-                ImageSequence = s;
-            ImageSequence.FindFileByName(fullName);
-            SetImage(ImageSequence.CurrentImage);
-        }
 
         private void OpenImage()
         {
@@ -126,7 +76,7 @@ namespace ImageViewer.Windows.ImageViewer
                 if (ImageSequence == null || ImageSequence.CurrentFile.FullName != dlg.FileName)
                 {
                     DirectoryImageSequence s = new DirectoryImageSequence(Directory.GetParent(dlg.FileName));
-                    s.TargetDpi = dpi;
+                    s.TargetDpi = Model.TargetDpi;
                     if (!s.Equals(ImageSequence))
                         ImageSequence = s;
                     ImageSequence.FindFileByName(dlg.FileName);
@@ -164,6 +114,70 @@ namespace ImageViewer.Windows.ImageViewer
             if (ImageSequence != null)
                 SetImage(ImageSequence.CurrentImage);
             GetWindow(this).Activate();
+        }
+
+        public IImageViewerController Controller
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public IImageViewerModel Model
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public ImageSource Image
+        {
+            get
+            {
+                return ImageBox.Source;
+            }
+            set
+            {
+                Window w = Window.GetWindow(this);
+                Scroller.Visibility = System.Windows.Visibility.Visible;
+                HandleScale(value);
+                ImageBox.Source = value;
+                flipped = false;
+                ImageBox.RenderTransform = hNormal;
+                Scroller.ScrollToTop();
+            }
+        }
+
+        public Dimensions Dimensions
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public void ScrollToTop()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Rescale()
+        {
+            throw new NotImplementedException();
         }
     }
 }
