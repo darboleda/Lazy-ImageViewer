@@ -1,6 +1,9 @@
 ﻿using ImageViewer.Windows.DirectoryPicker;
+using ImageViewer.Windows.Loader;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -23,12 +26,50 @@ namespace ImageViewer.Windows.ImageViewer
         private void ToggleScale()
         {
             if (Model.Image == null) return;
-
+            Model.IncrementViewMode();
             View.ScrollToTop();
             View.Rescale();
         }
 
+        private void OpenImage()
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.InitialDirectory = appSettings.DefaultDirectory;
+            String name = Model.FileName;
+            if (name != null) dlg.FileName = name;
+            dlg.Filter = "Image Files (.jpg, .png, .bmp)|*.jpg;*.png;*.jpeg;*.bmp";
 
+            bool? result = dlg.ShowDialog();
+            if (result.GetValueOrDefault())
+            {
+                Model.LoadFile(dlg.FileName);
+                View.Image = Model.Image;
+            }
+        }
+
+        void OpenDirectoryPicker(int direction)
+        {
+            if (directoryPicker != null && !directoryPicker.Done) return;
+
+            DirectoryPickWindow dp = new DirectoryPickWindow(appSettings.DefaultDirectory, View.Window);
+            dp.DirectoryOpened +=
+                (DirectoryInfo info, bool sameDir, bool pickedDir) => OnDirectoryOpened(info, sameDir, pickedDir, direction);
+            dp.Show();
+            directoryPicker = dp;
+        }
+
+        void OnDirectoryOpened(DirectoryInfo info, bool sameDir, bool pickedDir, int direction)
+        {
+            directoryPicker = null;
+            if (!(sameDir && (direction == 0 || (direction > 0 ? Model.SeekFirstImage() : Model.SeekLastImage()))) && pickedDir)
+            {
+                Model.Sequence = new DirectoryImageSequence(info.FullName);
+                Model.SeekFirstImage();
+            }
+
+            View.Image = Model.Image;
+            View.ActivateWindow();
+        }
 
         public void OnWindowLoaded(object sender, System.Windows.RoutedEventArgs e)
         {

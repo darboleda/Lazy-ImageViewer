@@ -21,13 +21,14 @@ namespace ImageViewer.Windows.ImageViewer
         public Dpi TargetDpi { get; set; }
 
         IImageSequence imageSequence;
-        IImageSequence ImageSequence
+        public IImageSequence ImageSequence
         {
             get { return imageSequence; }
             set
             {
                 IImageSequence prev = imageSequence;
                 imageSequence = value;
+                imageSequence.TargetDpi = TargetDpi;
                 Controller.OnSequenceChanged(prev, imageSequence);
             }
         }
@@ -42,6 +43,18 @@ namespace ImageViewer.Windows.ImageViewer
         public ViewMode GetMode(System.Windows.WindowState windowState)
         {
             throw new NotImplementedException();
+        }
+
+        public void LoadFile(String path)
+        {
+            if (ImageSequence == null || ImageSequence.CurrentFile.FullName != path)
+            {
+                DirectoryImageSequence s = new DirectoryImageSequence(Directory.GetParent(path));
+                s.TargetDpi = TargetDpi;
+                if (!s.Equals(ImageSequence))
+                    ImageSequence = s;
+                ImageSequence.FindFileByName(path);
+            }
         }
 
         public ViewMode IncrementViewMode()

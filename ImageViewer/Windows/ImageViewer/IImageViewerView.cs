@@ -29,5 +29,8 @@ namespace ImageViewer.Windows.ImageViewer
         Dimensions Dimensions { get; set; }
         void ScrollToTop();
         void Rescale();
+        void ActivateWindow();
+
+        Window Window { get; }
     }
 }

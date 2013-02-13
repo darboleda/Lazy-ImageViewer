@@ -24,7 +24,14 @@ namespace ImageViewer.Windows.ImageViewer
         ViewMode Mode { get; set; }
         ViewMode IncrementViewMode();
 
+        IImageSequence Sequence { get; set; }
         ImageSource Image { get; set; }
         Dpi TargetDpi { get; set; }
+
+        bool SeekLastImage();
+        bool SeekFirstImage();
+
+        String FileName { get; }
+        void LoadFile(String path);
     }
 }
