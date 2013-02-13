@@ -14,6 +14,11 @@ namespace ImageViewer.Windows.ImageViewer
         ViewMode maximizedScaleState;
         ViewMode regularScaleState;
 
+        ScaleTransform hFlip = new ScaleTransform(-1, 1);
+        ScaleTransform hNormal = new ScaleTransform(1, 1);
+
+        bool flipped = false;
+
         WindowState WindowState { get; set; }
 
         public IImageViewerController Controller { get; set; }
@@ -54,6 +59,7 @@ namespace ImageViewer.Windows.ImageViewer
                 if (!s.Equals(ImageSequence))
                     ImageSequence = s;
                 ImageSequence.FindFileByName(path);
+                Image = ImageSequence.CurrentImage;
             }
         }
 
@@ -78,23 +84,13 @@ namespace ImageViewer.Windows.ImageViewer
             {
                 return image;
             }
-            set
+            private set
             {
                 ImageSource prev = image;
                 image = value;
                 
                 Controller.OnImageChanged(prev, image);
             }
-        }
-
-        private void OpenImage(string fullName)
-        {
-            DirectoryImageSequence s = new DirectoryImageSequence(Directory.GetParent(fullName));
-            s.TargetDpi = TargetDpi;
-            if (!s.Equals(ImageSequence))
-                ImageSequence = s;
-            ImageSequence.FindFileByName(fullName);
-            Image = ImageSequence.CurrentImage;
         }
     }
 }

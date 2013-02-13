@@ -26,65 +26,9 @@ namespace ImageViewer.Windows.ImageViewer
             InitializeCallbacks();
         }
 
-        private void HandleScale(ImageSource image)
-        {
-            Window window = Window.GetWindow(this);
-            ViewMode s = Model.Mode;
 
-            double width;
-            double factor;
-            double height;
-            switch (s)
-            {
-                case ViewMode.FillHorizontal:
-                    width = Math.Min(window.Width, image.Width);
-                    factor = width / image.Width;
-                    Scroller.Width = factor * image.Width;
-                    Scroller.Height = Math.Min(window.Height, factor * image.Height);
-                    break;
-                case ViewMode.FitHorizontal:
-                    width = window.Width;
-                    factor = width / image.Width;
-                    Scroller.Width = factor * image.Width;
-                    Scroller.Height = Math.Min(window.Height, factor * image.Height);
-                    break;
-                case ViewMode.FitVertical:
-                    width = Math.Min(window.Width, image.Width);
-                    height = Math.Min(window.Height, image.Height);
-                    factor = Math.Min(width / image.Width, height / image.Height);
-                    Scroller.Height = factor * image.Height;
-                    Scroller.Width = factor * image.Width;
-                    break;
-            }
-            window.InvalidateVisual();
-        }
-
-
-        
-
-        public IImageViewerController Controller
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public IImageViewerModel Model
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public IImageViewerController Controller { get; set; }
+        public IImageViewerModel Model { get; set; }
 
         public ImageSource Image
         {
@@ -96,7 +40,7 @@ namespace ImageViewer.Windows.ImageViewer
             {
                 Window w = Window.GetWindow(this);
                 Scroller.Visibility = System.Windows.Visibility.Visible;
-                HandleScale(value);
+                Rescale();
                 ImageBox.Source = value;
                 flipped = false;
                 ImageBox.RenderTransform = hNormal;
@@ -104,26 +48,66 @@ namespace ImageViewer.Windows.ImageViewer
             }
         }
 
-        public Dimensions Dimensions
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         public void ScrollToTop()
         {
-            throw new NotImplementedException();
+            Scroller.ScrollToTop();
         }
+
+        private Dimensions CalculateDimensions()
+        {
+            Window window = Window;
+            ImageSource image = Image;
+            ViewMode s = Model.Mode;
+
+            Dimensions dim = new Dimensions();
+
+            double width;
+            double factor;
+            double height;
+            switch (s)
+            {
+                case ViewMode.FillHorizontal:
+                    width = Math.Min(window.Width, image.Width);
+                    factor = width / image.Width;
+                    dim.Width = factor * image.Width;
+                    dim.Height = Math.Min(window.Height, factor * image.Height);
+                    break;
+                case ViewMode.FitHorizontal:
+                    width = window.Width;
+                    factor = width / image.Width;
+                    dim.Width = factor * image.Width;
+                    dim.Height = Math.Min(window.Height, factor * image.Height);
+                    break;
+                case ViewMode.FitVertical:
+                    width = Math.Min(window.Width, image.Width);
+                    height = Math.Min(window.Height, image.Height);
+                    factor = Math.Min(width / image.Width, height / image.Height);
+                    dim.Height = factor * image.Height;
+                    dim.Width = factor * image.Width;
+                    break;
+            }
+            return dim;
+        }
+
+
+        public void ActivateWindow() { Window.Activate(); }
+
+        public new Window Window { get { return Window.GetWindow(this); } }
+
 
         public void Rescale()
         {
-            throw new NotImplementedException();
+            Dimensions dim = CalculateDimensions();
+            Scroller.Width = dim.Width;
+            Scroller.Height = dim.Height;
+            Window.InvalidateVisual();
+        }
+
+
+        public void ToggleWindowState()
+        {
+            Window window = Window;
+            window.WindowState = window.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
         }
     }
 }
