@@ -14,8 +14,8 @@ namespace ImageViewer.Windows.ImageViewer
 {
     class StandardImageViewerController : IImageViewerController
     {
-        IImageViewerModel Model { get; set; }
-        IImageViewerView View { get; set; }
+        public IImageViewerModel Model { get; set; }
+        public IImageViewerView View { get; set; }
 
         ApplicationSettings appSettings;
         DirectoryPickWindow directoryPicker;
@@ -50,7 +50,7 @@ namespace ImageViewer.Windows.ImageViewer
             }
         }
 
-        void OpenDirectoryPicker(int direction)
+        public void OpenDirectoryPicker(int direction)
         {
             if (directoryPicker != null && !directoryPicker.Done) return;
 
@@ -61,27 +61,28 @@ namespace ImageViewer.Windows.ImageViewer
             directoryPicker = dp;
         }
 
-        void OnDirectoryOpened(DirectoryInfo info, bool sameDir, bool pickedDir, int direction)
+        public void OnDirectoryOpened(DirectoryInfo info, bool sameDir, bool pickedDir, int direction)
         {
             directoryPicker = null;
-            if (!(sameDir && (direction == 0 || (direction > 0 ? Model.SeekFirstImage() : Model.SeekLastImage()))) && pickedDir)
+            if (!(sameDir && (direction == 0 || (direction > 0 ? Model.SeekFirstImage() : Model.SeekLastImage()))) || pickedDir)
             {
                 Model.Sequence = new DirectoryImageSequence(info.FullName);
                 Model.SeekFirstImage();
             }
-
+            appSettings.DefaultDirectory = info.FullName;
             View.Image = Model.Image;
             View.ActivateWindow();
+            View.Rescale();
         }
 
-        void OnWindowActivated(object sender, EventArgs args)
+        public void OnWindowActivated(object sender, EventArgs args)
         {
             if (directoryPicker == null) return;
             if (directoryPicker.Done) return;
             Window.GetWindow(directoryPicker).Activate();
         }
 
-        void OnPreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        public void OnPreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
@@ -89,23 +90,23 @@ namespace ImageViewer.Windows.ImageViewer
             }
         }
 
-        void OnWindowStateChanged(object sender, EventArgs e)
+        public void OnWindowStateChanged(object sender, EventArgs e)
         {
             View.ScrollToTop();
         }
 
-        void OnWindowMouseLeave(object sender, MouseEventArgs e)
+        public void OnWindowMouseLeave(object sender, MouseEventArgs e)
         {
             //mousein = false;
         }
 
-        void OnWindowMouseEnter(object sender, MouseEventArgs e)
+        public void OnWindowMouseEnter(object sender, MouseEventArgs e)
         {
             //mousein = true;
         }
 
         Point prevMousePos;
-        void OnWindowMouseMove(object sender, MouseEventArgs e)
+        public void OnWindowMouseMove(object sender, MouseEventArgs e)
         {
             Point pos = e.GetPosition((IInputElement)sender);
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -113,7 +114,7 @@ namespace ImageViewer.Windows.ImageViewer
             prevMousePos = pos;
         }
 
-        void OnWindowMouseDown(object sender, MouseButtonEventArgs e)
+        public void OnWindowMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.RightButton == MouseButtonState.Pressed)
             {
@@ -121,16 +122,16 @@ namespace ImageViewer.Windows.ImageViewer
             }
         }
 
-        void OnWindowLoaded(object sender, RoutedEventArgs e)
+        public void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
             Matrix m = PresentationSource.FromVisual(View.Window).CompositionTarget.TransformToDevice;
             Model.TargetDpi = new Dpi() { X = m.M11 * 96, Y = m.M22 * 96 };
 
             appSettings = ApplicationSettings.LoadAppSettings();
-            View.SetWindowDimensions(appSettings.StartingWidth,
-                                     appSettings.StartingHeight,
-                                     appSettings.StartingLeft,
-                                     appSettings.StartingTop);
+            View.SetWindowDimensions(appSettings.StartingLeft,
+                                     appSettings.StartingTop,
+                                     appSettings.StartingWidth,
+                                     appSettings.StartingHeight);
 
             if (App.StartupArguments.Length > 0)
             {
@@ -138,7 +139,7 @@ namespace ImageViewer.Windows.ImageViewer
             }
         }
 
-        void OnWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        public void OnWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             appSettings.StartingWidth = ((Window)sender).Width;
             appSettings.StartingHeight = ((Window)sender).Height;
@@ -147,12 +148,12 @@ namespace ImageViewer.Windows.ImageViewer
             appSettings.SaveAppSettings();
         }
 
-        void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
+        public void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
         {
             View.Rescale();
         }
 
-        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        public void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
             HandleKeyDown(e.Key);
         }
@@ -178,44 +179,38 @@ namespace ImageViewer.Windows.ImageViewer
                     if ((Keyboard.Modifiers & (ModifierKeys.Control)) != 0)
                         goto case Key.End;
 
-                    if (ImageSequence == null || !ImageSequence.Valid)
+                    if (!Model.SequenceReady)
                         OpenDirectoryPicker(0);
-                    else if (!ImageSequence.FindNextImage())
+                    else if (!Model.SeekNextImage())
                         OpenDirectoryPicker(1);
                     else
-                        SetImage(ImageSequence.CurrentImage);
+                        View.Image = Model.Image;
                     break;
 
                 case Key.Left:
                     if ((Keyboard.Modifiers & (ModifierKeys.Control)) != 0)
                         goto case Key.Home;
 
-                    if (ImageSequence == null || !ImageSequence.Valid)
+                    if (!Model.SequenceReady)
                         OpenDirectoryPicker(0);
-                    else if (!ImageSequence.FindPreviousImage())
+                    else if (!Model.SeekPreviousImage())
                         OpenDirectoryPicker(-1);
                     else
-                        SetImage(ImageSequence.CurrentImage);
+                        View.Image = Model.Image;
                     break;
 
                 case Key.Home:
-                    if (ImageSequence == null)
+                    if (!Model.SequenceReady || !Model.SeekFirstImage())
                         OpenDirectoryPicker(0);
                     else
-                    {
-                        ImageSequence.FindFirstImage();
-                        SetImage(ImageSequence.CurrentImage);
-                    }
+                        View.Image = Model.Image;
                     break;
 
                 case Key.End:
-                    if (ImageSequence == null)
+                    if (!Model.SequenceReady || !Model.SeekLastImage())
                         OpenDirectoryPicker(0);
                     else
-                    {
-                        ImageSequence.FindLastImage();
-                        SetImage(ImageSequence.CurrentImage);
-                    }
+                        View.Image = Model.Image;
                     break;
 
                 case Key.Space:
@@ -223,32 +218,31 @@ namespace ImageViewer.Windows.ImageViewer
                     break;
 
                 case Key.Enter:
-                    _parent = Window.GetWindow(this);
-                    _parent.WindowState = _parent.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+                    View.ToggleWindowState();
                     break;
 
                 case Key.Escape:
-                    _parent = Window.GetWindow(this);
-                    if (_parent.WindowState == WindowState.Maximized)
-                        _parent.WindowState = WindowState.Normal;
+                    if (View.WindowState == WindowState.Maximized)
+                        View.ToggleWindowState();
                     else
-                        _parent.Close();
+                        View.CloseWindow();
                     break;
+
                 case Key.Up:
                     if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0)
-                        Scroller.ScrollToTop();
+                        View.ScrollToTop();
                     else if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
                         OpenDirectoryPicker(0);
                     else
-                        Scroller.ScrollToVerticalOffset(Scroller.VerticalOffset - 50);
+                        View.ScrollToRelative(-50);
                     break;
                 case Key.Down:
                     if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0)
-                        Scroller.ScrollToBottom();
+                        View.ScrollToBottom();
                     else if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
                         goto case Key.Space;
                     else
-                        Scroller.ScrollToVerticalOffset(Scroller.VerticalOffset + 50);
+                        View.ScrollToRelative(50);
                     break;
 
 
@@ -261,7 +255,7 @@ namespace ImageViewer.Windows.ImageViewer
 
         public void OnImageChanged(System.Windows.Media.ImageSource previousImage, System.Windows.Media.ImageSource newImage)
         {
-            throw new NotImplementedException();
+            View.Image = newImage;
         }
 
         public void OnSequenceChanged(Loader.IImageSequence previousSequence, Loader.IImageSequence newSequence)

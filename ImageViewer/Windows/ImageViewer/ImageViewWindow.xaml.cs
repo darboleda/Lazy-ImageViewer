@@ -20,10 +20,38 @@ namespace ImageViewer.Windows.ImageViewer
     {
         private const double BASE_DPI = 96;
 
+        ScaleTransform hFlip = new ScaleTransform(-1, 1);
+        ScaleTransform hNormal = new ScaleTransform(1, 1);
+
         public ImageViewWindow()
         {
             InitializeComponent();
+
+            Controller = new StandardImageViewerController();
+            Model = new StandardImageViewerModel();
+
+            Controller.View = this;
+            Controller.Model = Model;
+            Model.View = this;
+            Model.Controller = Controller;
+
             InitializeCallbacks();
+        }
+
+        void InitializeCallbacks()
+        {
+            Window window = Window.GetWindow(this);
+            window.SizeChanged += Controller.OnWindowSizeChanged;
+            window.Closing += Controller.OnWindowClosing;
+            window.Loaded += Controller.OnWindowLoaded;
+            window.PreviewMouseDoubleClick += Controller.OnPreviewMouseDoubleClick;
+            window.PreviewMouseDown += Controller.OnWindowMouseDown;
+            window.PreviewMouseMove += Controller.OnWindowMouseMove;
+            window.MouseEnter += Controller.OnWindowMouseEnter;
+            window.MouseLeave += Controller.OnWindowMouseLeave;
+            window.StateChanged += Controller.OnWindowStateChanged;
+            window.Activated += Controller.OnWindowActivated;
+            window.PreviewKeyDown += Controller.OnPreviewKeyDown;
         }
 
 
@@ -40,10 +68,9 @@ namespace ImageViewer.Windows.ImageViewer
             {
                 Window w = Window.GetWindow(this);
                 Scroller.Visibility = System.Windows.Visibility.Visible;
-                Rescale();
                 ImageBox.Source = value;
-                flipped = false;
                 ImageBox.RenderTransform = hNormal;
+                Rescale();
                 Scroller.ScrollToTop();
             }
         }
@@ -60,25 +87,26 @@ namespace ImageViewer.Windows.ImageViewer
             ViewMode s = Model.Mode;
 
             Dimensions dim = new Dimensions();
+            if (image == null) return dim;
 
             double width;
             double factor;
             double height;
             switch (s)
             {
-                case ViewMode.FillHorizontal:
+                case ViewMode.FitHorizontal:
                     width = Math.Min(window.Width, image.Width);
                     factor = width / image.Width;
                     dim.Width = factor * image.Width;
                     dim.Height = Math.Min(window.Height, factor * image.Height);
                     break;
-                case ViewMode.FitHorizontal:
+                case ViewMode.FillHorizontal:
                     width = window.Width;
                     factor = width / image.Width;
                     dim.Width = factor * image.Width;
                     dim.Height = Math.Min(window.Height, factor * image.Height);
                     break;
-                case ViewMode.FitVertical:
+                case ViewMode.FitBoth:
                     width = Math.Min(window.Width, image.Width);
                     height = Math.Min(window.Height, image.Height);
                     factor = Math.Min(width / image.Width, height / image.Height);
@@ -92,8 +120,7 @@ namespace ImageViewer.Windows.ImageViewer
 
         public void ActivateWindow() { Window.Activate(); }
 
-        public new Window Window { get { return Window.GetWindow(this); } }
-
+        public Window Window { get { return Window.GetWindow(this); } }
 
         public void Rescale()
         {
@@ -108,6 +135,41 @@ namespace ImageViewer.Windows.ImageViewer
         {
             Window window = Window;
             window.WindowState = window.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+        }
+
+
+        public void ScrollToBottom()
+        {
+            Scroller.ScrollToBottom();
+        }
+
+        public void FocusScroller()
+        {
+            Scroller.Focus();
+        }
+
+        public void SetWindowDimensions(double left, double top, double width, double height)
+        {
+            Window window = Window;
+            window.Left = left;
+            window.Top = top;
+            window.Width = width;
+            window.Height = height;
+        }
+
+        public void FlipImage()
+        {
+            ImageBox.RenderTransform = (ImageBox.RenderTransform.Equals(hNormal) ? hFlip : hNormal);
+        }
+
+        public void ScrollToRelative(double delta)
+        {
+            Scroller.ScrollToVerticalOffset(Scroller.VerticalOffset + delta);
+        }
+
+        public void CloseWindow()
+        {
+            Window.Close();
         }
     }
 }

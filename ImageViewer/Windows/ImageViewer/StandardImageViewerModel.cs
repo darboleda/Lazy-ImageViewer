@@ -14,19 +14,14 @@ namespace ImageViewer.Windows.ImageViewer
         ViewMode maximizedScaleState;
         ViewMode regularScaleState;
 
-        ScaleTransform hFlip = new ScaleTransform(-1, 1);
-        ScaleTransform hNormal = new ScaleTransform(1, 1);
-
-        bool flipped = false;
-
-        WindowState WindowState { get; set; }
+        public WindowState WindowState { get; set; }
 
         public IImageViewerController Controller { get; set; }
         public IImageViewerView View { get; set; }
         public Dpi TargetDpi { get; set; }
 
         IImageSequence imageSequence;
-        public IImageSequence ImageSequence
+        public IImageSequence Sequence
         {
             get { return imageSequence; }
             set
@@ -34,47 +29,32 @@ namespace ImageViewer.Windows.ImageViewer
                 IImageSequence prev = imageSequence;
                 imageSequence = value;
                 imageSequence.TargetDpi = TargetDpi;
-                Controller.OnSequenceChanged(prev, imageSequence);
             }
         }
 
         public StandardImageViewerModel()
         {
             maximizedScaleState = ViewMode.FitHorizontal;
-            regularScaleState = ViewMode.FitHorizontal;
+            regularScaleState = ViewMode.FillHorizontal;
             imageSequence = null;
-        }
-
-        public ViewMode GetMode(System.Windows.WindowState windowState)
-        {
-            throw new NotImplementedException();
         }
 
         public void LoadFile(String path)
         {
-            if (ImageSequence == null || ImageSequence.CurrentFile.FullName != path)
+            if (Sequence == null || Sequence.CurrentFile.FullName != path)
             {
                 DirectoryImageSequence s = new DirectoryImageSequence(Directory.GetParent(path));
                 s.TargetDpi = TargetDpi;
-                if (!s.Equals(ImageSequence))
-                    ImageSequence = s;
-                ImageSequence.FindFileByName(path);
-                Image = ImageSequence.CurrentImage;
+                if (!s.Equals(Sequence))
+                    Sequence = s;
+                Sequence.FindFileByName(path);
+                Image = Sequence.CurrentImage;
             }
         }
 
         public ViewMode IncrementViewMode()
         {
-            if (View.WindowState == System.Windows.WindowState.Maximized)
-            {
-                maximizedScaleState = (ViewMode)(((int)maximizedScaleState + 1) % Enum.GetNames(typeof(ViewMode)).Length);
-                return maximizedScaleState;
-            }
-            else
-            {
-                regularScaleState = (ViewMode)(((int)regularScaleState + 1) % Enum.GetNames(typeof(ViewMode)).Length);
-                return regularScaleState;
-            }
+            return (Mode = (ViewMode)(((int)Mode + 1) % Enum.GetNames(typeof(ViewMode)).Length));
         }
 
         private ImageSource image;
@@ -84,13 +64,82 @@ namespace ImageViewer.Windows.ImageViewer
             {
                 return image;
             }
-            private set
+            set
             {
                 ImageSource prev = image;
                 image = value;
-                
-                Controller.OnImageChanged(prev, image);
             }
+        }
+
+        public ViewMode Mode
+        {
+            get
+            {
+                return (View.WindowState == WindowState.Maximized ? maximizedScaleState : regularScaleState);
+            }
+            set
+            {
+                switch (View.WindowState)
+                {
+                    case WindowState.Maximized:
+                        maximizedScaleState = value;
+                        break;
+
+                    case WindowState.Normal:
+                        regularScaleState = value;
+                        break;
+                }
+            }
+        }
+
+        public bool SequenceReady
+        {
+            get { return Sequence != null && Sequence.Valid; }
+        }
+
+        public bool SeekLastImage()
+        {
+            if (Sequence.FindLastImage())
+            {
+                Image = Sequence.CurrentImage;
+                return true;
+            }
+            return false;
+        }
+
+        public bool SeekFirstImage()
+        {
+            if (Sequence.FindFirstImage())
+            {
+                Image = Sequence.CurrentImage;
+                return true;
+            }
+            return false;
+        }
+
+        public bool SeekPreviousImage()
+        {
+            if (Sequence.FindPreviousImage())
+            {
+                Image = Sequence.CurrentImage;
+                return true;
+            }
+            return false;
+        }
+
+        public bool SeekNextImage()
+        {
+            if (Sequence.FindNextImage())
+            {
+                Image = Sequence.CurrentImage;
+                return true;
+            }
+            return false;
+        }
+
+        public string FileName
+        {
+            get { return Sequence == null || Sequence.CurrentFile == null ? null : Sequence.CurrentFile.FullName; }
         }
     }
 }

@@ -11,14 +11,14 @@ namespace ImageViewer.Windows.ImageViewer
     {
         public double Width { get; set; }
         public double Height { get; set; }
-        public Dimensions(double width, double height)
+        public Dimensions(double width, double height) : this()
         {
             Width = width;
             Height = height;
         }
     }
 
-    interface IImageViewerView
+    public interface IImageViewerView
     {
         IImageViewerController Controller { get; set; }
         IImageViewerModel Model { get; set; }
@@ -27,6 +27,8 @@ namespace ImageViewer.Windows.ImageViewer
         WindowState WindowState { get; set; }
 
         void ScrollToTop();
+        void ScrollToBottom();
+
         void Rescale();
         void ActivateWindow();
         void FocusScroller();
@@ -37,5 +39,6 @@ namespace ImageViewer.Windows.ImageViewer
         void ScrollToRelative(double delta);
 
         Window Window { get; }
+        void CloseWindow();
     }
 }

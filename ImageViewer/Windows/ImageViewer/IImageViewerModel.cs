@@ -8,14 +8,14 @@ using System.Windows.Media;
 
 namespace ImageViewer.Windows.ImageViewer
 {
-    enum ViewMode
+    public enum ViewMode
     {
         FillHorizontal = 0,
         FitHorizontal = 1,
-        FitVertical = 2
+        FitBoth = 2
     }
 
-    interface IImageViewerModel
+    public interface IImageViewerModel
     {
         IImageViewerController Controller { get; set; }
         IImageViewerView View { get; set; }
@@ -28,8 +28,12 @@ namespace ImageViewer.Windows.ImageViewer
         ImageSource Image { get; set; }
         Dpi TargetDpi { get; set; }
 
+        bool SequenceReady { get; }
+
         bool SeekLastImage();
         bool SeekFirstImage();
+        bool SeekPreviousImage();
+        bool SeekNextImage();
 
         String FileName { get; }
         void LoadFile(String path);

@@ -126,7 +126,6 @@
       <DependentUpon>ImageViewWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Windows\ImageViewer\ImageViewerCallbacks.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Windows\Loader\DirectoryImageSequence.cs" />

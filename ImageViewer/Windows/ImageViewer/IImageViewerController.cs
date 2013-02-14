@@ -10,7 +10,7 @@ using System.Windows.Media;
 
 namespace ImageViewer.Windows.ImageViewer
 {
-    interface IImageViewerController
+    public interface IImageViewerController
     {
         IImageViewerModel Model { get; set; }
         IImageViewerView View { get; set; }
@@ -21,7 +21,7 @@ namespace ImageViewer.Windows.ImageViewer
         void OnWindowStateChanged(object sender, EventArgs e);
         void OnWindowSizeChanged(object sender, SizeChangedEventArgs e);
 
-        void OnPreviewKeyDown(KeyEventArgs e);
+        void OnPreviewKeyDown(object sender, KeyEventArgs e);
         
         void OnPreviewMouseDoubleClick(object sender, MouseButtonEventArgs e);
         void OnWindowMouseDown(object sender, MouseButtonEventArgs e);
