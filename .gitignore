@@ -1,2 +1,4 @@
 ImageViewer/bin/
 ImageViewer/obj/
+*.suo
+*.user
