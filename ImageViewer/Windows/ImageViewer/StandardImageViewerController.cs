@@ -64,10 +64,15 @@ namespace ImageViewer.Windows.ImageViewer
         public void OnDirectoryOpened(DirectoryInfo info, bool sameDir, bool pickedDir, int direction)
         {
             directoryPicker = null;
-            if (!(sameDir && (direction == 0 || (direction > 0 ? Model.SeekFirstImage() : Model.SeekLastImage()))) || pickedDir)
+            if (!sameDir || (direction == 0 && pickedDir))
             {
                 Model.Sequence = new DirectoryImageSequence(info.FullName);
                 Model.SeekFirstImage();
+            }
+            else if (pickedDir)
+            {
+                if (direction > 0) Model.SeekFirstImage();
+                else if (direction < 0) Model.SeekLastImage();
             }
             appSettings.DefaultDirectory = info.FullName;
             View.Image = Model.Image;

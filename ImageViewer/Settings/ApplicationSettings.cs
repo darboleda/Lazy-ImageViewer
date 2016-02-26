@@ -80,7 +80,7 @@ namespace ImageViewer
         {
             FileInfo fi = null;
             try { fi = new FileInfo(Application.LocalUserAppDataPath + @"\ImageViewer.config"); }
-            catch (Exception e) { }
+            catch (Exception) { /* No settings? Just ignore it */ }
 
             if (fi == null || !fi.Exists)
             {
@@ -101,7 +101,7 @@ namespace ImageViewer
                 {
                     return (ApplicationSettings)xml.Deserialize(file);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     ApplicationSettings s = new ApplicationSettings();
                     s.DefaultDirectory = Environment.GetFolderPath(System.Environment.SpecialFolder.MyPictures);
