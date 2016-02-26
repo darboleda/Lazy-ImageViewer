@@ -113,13 +113,15 @@ namespace ImageViewer.Windows.Loader
 
         public bool FindNextImage()
         {
-            fileIndex = FindFile(ref current, fileIndex.Value + 1, false, false);
+            var nextIndex = (fileIndex != null ? fileIndex.Value + 1 : 0);
+            fileIndex = FindFile(ref current, nextIndex, false, false);
             return fileIndex != null && fileIndex.HasValue;
         }
 
         public bool FindPreviousImage()
         {
-            fileIndex = FindFile(ref current, fileIndex.Value - 1, true, false);
+            var previousIndex = (fileIndex != null ? fileIndex.Value - 1 : files.Length - 1);
+            fileIndex = FindFile(ref current, previousIndex, true, false);
             return fileIndex != null && fileIndex.HasValue;
         }
 

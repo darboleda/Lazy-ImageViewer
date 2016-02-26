@@ -26,6 +26,8 @@ namespace ImageViewer.Windows.DirectoryPicker
         string currentDirectoryName;
         string[] subDirectories;
         Stack<string> previousDirectories;
+        bool pickedDirectory = false;
+
         public bool Done { get; private set; }
         void SetDirectory(string name)
         {
@@ -194,7 +196,7 @@ namespace ImageViewer.Windows.DirectoryPicker
                 }
                 else if (files.Length > 0)
                 {
-                    Close();
+                    Close(true);
                     if (DirectoryOpened != null)
                     {
                         DirectoryOpened(new DirectoryInfo(currentDirectoryName), startingDirectory.FullName == currentDirectoryName, true);
@@ -258,8 +260,7 @@ namespace ImageViewer.Windows.DirectoryPicker
                     break;
 
                 case Key.Escape:
-                    Close();
-                    DirectoryOpened(startingDirectory, true, false);
+                    Close(false);
                     break;
             }
             Root.InvalidateVisual();
@@ -267,8 +268,15 @@ namespace ImageViewer.Windows.DirectoryPicker
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
+            if (!pickedDirectory) DirectoryOpened(startingDirectory, true, false);
             Done = true;
             base.OnClosing(e);
+        }
+
+        private void Close(bool pickedDirectory)
+        {
+            this.pickedDirectory = pickedDirectory;
+            this.Close();
         }
 
         private bool IsExtensionImage(string extension) {
