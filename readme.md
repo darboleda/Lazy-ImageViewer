@@ -9,6 +9,9 @@ the mouse. Basically, it rips off a bunch of controls from IrfanView.
 
 I just wanted to read comics lazily, okay?
 
+Despite this, mouse click-and-drag scrolling and scrollwheel scrolling *does* in
+fact scroll the image.
+
 ## Controls
 Main Window
 
